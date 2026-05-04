@@ -1,0 +1,13 @@
+{
+  "name": "ktu-scrap-server",
+  "main": "src/index.ts",
+  "dependencies": {
+    "hono": "^4.12.16"
+  },
+  "scripts": {
+    "dev": "bun run --watch src/index.ts",
+    "start": "dist/KtuScrapServer",
+    "build": "bun run build.ts"
+  },
+  "type": "module"
+}
