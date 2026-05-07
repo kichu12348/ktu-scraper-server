@@ -2,25 +2,27 @@
  * A highly resilient fetch wrapper that automatically retries on 502/503/504 errors.
  * It uses exponential backoff with jitter to avoid triggering WAFs.
  */
-
-const maxRetries = 6;
+import { fetch } from "bun";
 
 export async function resilientFetch(
   url: string,
   options: RequestInit,
+  maxRetries = 99,
 ): Promise<Response> {
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
-      // 8-second leash per request to prevent hanging the Worker
+      // 60-second leash per request to prevent hanging the Worker
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 8000);
+      const timeoutId = setTimeout(() => controller.abort(), 60000);
 
       const fetchOptions: RequestInit & {
         tls?: { rejectUnauthorized: boolean };
+        idleTimeout?: number;
       } = {
         ...options,
         signal: controller.signal,
-        tls: { rejectUnauthorized: false },
+        idleTimeout: 60000, // Ensure idle connections are also killed after 60s
+        tls: { rejectUnauthorized: false }, // Disable TLS verification to handle self-signed certs
       };
 
       const res = await fetch(url, fetchOptions);
