@@ -37,7 +37,6 @@ gradesRouter.post("/grade-card", async (c) => {
           Cookie: sessionCookie,
         },
         body: searchPayload.toString(),
-        signal: AbortSignal.timeout(8000), // Give it 8 seconds to process the DB query
       });
     } catch (e) {
       console.error(
@@ -68,7 +67,6 @@ gradesRouter.post("/get-grade-card-token", async (c) => {
     const { sessionCookie } = await c.req.json<{ sessionCookie: string }>();
     const res = await resilientFetch(config.GRADE_CARD_URL, {
       headers: { ...BROWSER_HEADERS, Cookie: sessionCookie },
-      signal: AbortSignal.timeout(5000),
     });
 
     const html = await res.text();
